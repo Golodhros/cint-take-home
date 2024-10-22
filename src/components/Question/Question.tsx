@@ -2,37 +2,12 @@ import { useState, useId, useRef, type FormEvent } from 'react';
 
 import type { Question } from '../../hooks/useExternalQuestions';
 import { Button } from '../Button/Button';
-import { shuffledAnswerArray, classNames } from '../../utils';
-
-const Card = ({
-    children,
-    className,
-}: {
-    children: React.ReactNode;
-    className?: string;
-}) => {
-    return (
-        <div
-            className={classNames(
-                'bg-white shadow-md rounded-lg p-6',
-                'border border-gray-200',
-                'transition-shadow duration-300 ease-in-out',
-                'hover:shadow-lg',
-                className
-            )}
-        >
-            {children}
-        </div>
-    );
-};
-
-const ActionRow = ({ children }: { children: React.ReactNode }) => {
-    return <div className="mt-4 flex justify-end space-x-2">{children}</div>;
-};
+import { Card, ActionRow } from '../Card/Card';
+import { shuffledAnswerArray } from '../../utils';
 
 type QuestionCardProps = {
     question: Question;
-    onAnswer: (answer: string | boolean) => void;
+    onAnswer: (answer: boolean) => void;
 };
 
 export const MultipleChoiceQuestion = ({
@@ -62,7 +37,9 @@ export const MultipleChoiceQuestion = ({
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         if (selectedAnswer) {
-            onAnswer(selectedAnswer);
+            const isCorrect = selectedAnswer === question.correct_answer;
+
+            onAnswer(isCorrect);
         }
     };
 
@@ -100,14 +77,18 @@ export const MultipleChoiceQuestion = ({
 };
 
 export const BooleanQuestion = ({ question, onAnswer }: QuestionCardProps) => {
-    const [selectedAnswer, setSelectedAnswer] = useState<boolean | null>(null);
+    const [selectedAnswer, setSelectedAnswer] = useState<
+        'True' | 'False' | null
+    >(null);
     const firstResponseId = useId();
     const secondResponseId = useId();
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         if (selectedAnswer !== null) {
-            onAnswer(selectedAnswer);
+            const isCorrect = selectedAnswer === question.correct_answer;
+
+            onAnswer(isCorrect);
         }
     };
 
@@ -119,11 +100,11 @@ export const BooleanQuestion = ({ question, onAnswer }: QuestionCardProps) => {
                     <input
                         id={firstResponseId}
                         type="radio"
-                        value="true"
+                        value="True"
                         name="answer"
                         className="size-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600"
-                        checked={selectedAnswer === true}
-                        onChange={() => setSelectedAnswer(true)}
+                        checked={selectedAnswer === 'True'}
+                        onChange={() => setSelectedAnswer('True')}
                     />
                     <label
                         htmlFor={firstResponseId}
@@ -136,11 +117,11 @@ export const BooleanQuestion = ({ question, onAnswer }: QuestionCardProps) => {
                     <input
                         id={secondResponseId}
                         type="radio"
-                        value="false"
+                        value="False"
                         name="answer"
                         className="size-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600"
-                        checked={selectedAnswer === false}
-                        onChange={() => setSelectedAnswer(false)}
+                        checked={selectedAnswer === 'False'}
+                        onChange={() => setSelectedAnswer('False')}
                     />
                     <label
                         htmlFor={secondResponseId}
@@ -166,7 +147,10 @@ export const TextQuestion = ({ question, onAnswer }: QuestionCardProps) => {
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         if (answer) {
-            onAnswer(answer);
+            const isCorrect =
+                answer.toLowerCase().trim() === question.correct_answer;
+
+            onAnswer(isCorrect);
         }
     };
 

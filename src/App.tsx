@@ -18,33 +18,67 @@
 // Improvements from here
 // - Add unit tests
 // - Test and fix a11y in screen readers
-// -
 
-import { useExternalQuestions } from 'hooks/useExternalQuestions';
+import { useEffect, useState } from 'react';
+import {
+    useExternalQuestions,
+    type Question,
+} from 'hooks/useExternalQuestions';
 import { Quiz } from './components/Quiz/Quiz';
+import { LoadingScreen } from './components/LoadingScreen/LoadingScreen';
+import { ErrorMessage } from './components/ErrorMessage/ErrorMessage';
+import { shuffledQuestionArray } from './utils';
 
 const DEFAULT_QUESTION_COUNT = 3;
 
 function App() {
-    // Get Questions and store them in state
-    const { isLoading, data: allQuestions } = useExternalQuestions();
+    const { isLoading, error, data: allQuestions } = useExternalQuestions();
+    const [round, setRound] = useState<Question[]>([]);
+    const [rest, setRest] = useState<Question[]>([]);
+
+    const splitQuestions = (questions: Question[]) => {
+        const shuffledArray = shuffledQuestionArray(questions);
+        const newRound = shuffledArray.slice(0, DEFAULT_QUESTION_COUNT);
+        const restOfQuestions = shuffledArray.slice(
+            DEFAULT_QUESTION_COUNT,
+            DEFAULT_QUESTION_COUNT + shuffledArray.length
+        );
+
+        return { newRound, restOfQuestions };
+    };
+
+    useEffect(() => {
+        const { newRound, restOfQuestions } = splitQuestions(allQuestions);
+        setRound(newRound);
+        setRest(restOfQuestions);
+    }, [allQuestions]);
+
+    const handleRestart = () => {
+        const { newRound, restOfQuestions } = splitQuestions(rest);
+        setRound(newRound);
+        setRest(restOfQuestions);
+    };
+
+    if (isLoading) {
+        return <LoadingScreen />;
+    }
+
+    if (error) {
+        return <ErrorMessage message={error.message} />;
+    }
 
     if (!allQuestions) {
-        return null;
+        return <ErrorMessage message={'No Messages available'} />;
     }
 
     return (
         <div className="relative overflow-hidden bg-white">
             <div className="h-screen sm:pb-40 sm:pt-24 lg:pb-48 lg:pt-40">
                 <div className="relative mx-auto max-w-7xl px-4 sm:static sm:px-6 lg:px-8">
-                    <h1>Quiz</h1>
                     {isLoading ? (
                         'Loading...'
                     ) : (
-                        <Quiz
-                            questions={allQuestions}
-                            roundSize={DEFAULT_QUESTION_COUNT}
-                        />
+                        <Quiz questions={round} onRestart={handleRestart} />
                     )}
                 </div>
             </div>
