@@ -29,7 +29,7 @@ export const MultipleChoiceQuestion = ({
     // Avoid re-shuffling the questions with every state change
     const shuffledAnswers = useRef(
         shuffledAnswerArray([
-            ...question.incorrect_answers,
+            ...(question.incorrect_answers || []),
             question.correct_answer,
         ])
     );

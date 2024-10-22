@@ -4,21 +4,15 @@
 
 ### Install
 
-Create the project.
-
+Clone the project
 ```bash
-pnpm dlx degit joaopaulomoraes/reactjs-vite-tailwindcss-boilerplate my-app
-```
-
-Access the project directory.
-
-```bash
-cd my-app
+git clone https://github.com/Golodhros/cint-take-home.git .
 ```
 
 Install dependencies.
 
 ```bash
+cd cint-take-home
 pnpm install
 ```
 
@@ -38,24 +32,6 @@ pnpm run lint
 
 ```bash
 pnpm run typecheck
-```
-
-### Build
-
-```bash
-pnpm run build
-```
-
-### Test
-
-```bash
-pnpm run test
-```
-
-View and interact with your tests via UI.
-
-```bash
-pnpm run test:ui
 ```
 
 
